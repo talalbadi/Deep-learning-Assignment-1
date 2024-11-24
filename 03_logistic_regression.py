@@ -50,11 +50,14 @@ n_output = 1
 
 # Initialize weights and biases
 W0 = np.zeros(1)
+A=np.random.randn(2)*0.1
+b=np.random.randn(1)*0.1
 W1 = np.random.randn(1) * 0.1
 W2 = np.random.randn(1) * 0.1
 
 # Create nodes
 x1_node = Input()
+x_node = Input()
 x2_node = Input()
 y_node = Input()
 
@@ -62,8 +65,10 @@ w0_node = Parameter(W0)
 w1_node = Parameter(W1)
 w2_node = Parameter(W2)
 #b1_node = Parameter(b1)
-
+A_node=Parameter(A)
+b_node=Parameter(b)
 # Build computation graph
+z_node = Linear(A_node,x_node,b_node)
 u1_node = Multiply(x1_node,w1_node)
 u2_node = Multiply(x2_node,w2_node)
 u12_node = Addition(u1_node,u2_node)
@@ -72,7 +77,8 @@ sigmoid = Sigmoid(u_node)
 loss = BCE(y_node, sigmoid)
 
 # Create graph outside the training loop
-graph = [x1_node,x2_node,w0_node,w1_node,w2_node,u1_node,u2_node,u12_node,u_node,sigmoid,loss]
+#graph = [x1_node,x2_node,w0_node,w1_node,w2_node,u1_node,u2_node,u12_node,u_node,sigmoid,loss]
+graph = [x_node,A_node,b_node,z_node,y_node,sigmoid,loss]
 trainable = [w0_node,w1_node,w2_node]
 
 # Training loop

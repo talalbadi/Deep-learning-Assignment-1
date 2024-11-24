@@ -82,17 +82,18 @@ class Addition(Node):
         self.gradients[y] = self.outputs[0].gradients[self]
 
 class Linear(Node):
-    def __init__(self, w , x , b):
-        super().__init__([w,x,b])
+    def __init__(self, A , x , b):
+        super().__init__([A,x,b])
 
     def forward(self):
-       w,x,b=self.inputs
-       self.value=w.value@x.value+b.value
+       A,x,b=self.inputs
+       self.value=A.value@x.value+b.value
     
     def backward(self):
-         w,x,b=self.inputs
-         self.graients[w]=x.value
-         self.gradients[x]=w.value
+        A,x,b =self.inputs
+        self.gradients[A]=self.outputs[0].gradiants[self]@x.value.T
+        self.gradients[x]=self.outputs[0].gradiants[self]@A.value
+        self.gradients[b]=self.outputs[0].gradiants[self]
          
 
 
