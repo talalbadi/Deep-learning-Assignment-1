@@ -91,9 +91,9 @@ class Linear(Node):
     
     def backward(self):
         A,x,b =self.inputs
-        self.gradients[A]=self.outputs[0].gradiants[self]@x.value.T
-        self.gradients[x]=self.outputs[0].gradiants[self]@A.value
-        self.gradients[b]=self.outputs[0].gradiants[self]
+        self.gradients[A]=x.value.T* self.outputs[0].gradients[self]
+        self.gradients[x]=self.outputs[0].gradients[self]*A.value
+        self.gradients[b]=self.outputs[0].gradients[self]
          
 
 
