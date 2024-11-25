@@ -36,7 +36,7 @@ plt.show()
 # Split data
 indices = np.arange(X.shape[0])
 np.random.shuffle(indices)
-batch_size=1
+batch_size=128
 test_set_size = int(len(X) * TEST_SIZE)
 test_indices = indices[:test_set_size]
 train_indices = indices[test_set_size:]
@@ -127,7 +127,10 @@ for i in range(X_test.shape[0]):
     x_node.value=X_test[i]
     #x2_node.value = X_test[i][1].reshape(1, -1)
     forward_pass(graph)
-
+   # if np.round(sigmoid.value)== y_test[i]:
+    #    correct_predictions += 1
+    #the above method count the the boundary as a correct precdition!
+    #that's why i used the below method
     if sigmoid.value >0.5 and y_test[i]==1 or sigmoid.value <0.5 and y_test[i]==0:
         correct_predictions += 1
 
