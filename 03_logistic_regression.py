@@ -120,12 +120,13 @@ for epoch in range(epochs):
 # Evaluate the model
 correct_predictions = 0
 for i in range(X_test.shape[0]):
+  
     #x1_node.value = X_test[i][0].reshape(1, -1)
     x_node.value=X_test[i]
     #x2_node.value = X_test[i][1].reshape(1, -1)
     forward_pass(graph)
 
-    if np.argmax(sigmoid.value) == y_test[i]:
+    if sigmoid.value >0.5 and y_test[i]==1 or sigmoid.value <0.5 and y_test[i]==0:
         correct_predictions += 1
 
 accuracy = correct_predictions / X_test.shape[0]
