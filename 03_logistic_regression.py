@@ -36,7 +36,7 @@ plt.show()
 # Split data
 indices = np.arange(X.shape[0])
 np.random.shuffle(indices)
-batch_size=8
+batch_size=1
 test_set_size = int(len(X) * TEST_SIZE)
 test_indices = indices[:test_set_size]
 train_indices = indices[test_set_size:]
@@ -152,7 +152,7 @@ plt.contourf(xx, yy, Z, alpha=0.8)
 plt.scatter(X[:, 0], X[:, 1], c=y)
 plt.xlabel('Feature 1')
 plt.ylabel('Feature 2')
-plt.title('Decision Boundary')
+plt.title(f'Decision Boundary - batch size {batch_size}')
 plt.savefig(f'run using batch {batch_size}')
 plt.show()
 
