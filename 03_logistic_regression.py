@@ -36,7 +36,7 @@ plt.show()
 # Split data
 indices = np.arange(X.shape[0])
 np.random.shuffle(indices)
-
+batch_size=8
 test_set_size = int(len(X) * TEST_SIZE)
 test_indices = indices[:test_set_size]
 train_indices = indices[test_set_size:]
@@ -50,7 +50,7 @@ n_output = 1
 
 # Initialize weights and biases
 W0 = np.zeros(1)
-A=np.random.randn(2)*0.1
+A=np.random.randn(n_output,n_features)*0.1
 b=np.random.randn(1)*0.1
 W1 = np.random.randn(1) * 0.1
 W2 = np.random.randn(1) * 0.1
@@ -103,11 +103,13 @@ def sgd_update(trainables, learning_rate=1e-2):
 
 for epoch in range(epochs):
     loss_value = 0
-    for i in range(X_train.shape[0]):
-        x_node.value=X_train[i]
+    for i in range(int(X_train.shape[0]/batch_size)):
+        k=i*batch_size
+
+        x_node.value=X_train[k:k+batch_size]
         #x1_node.value = X_train[i][0].reshape(1, -1)
        # x2_node.value = X_train[i][1].reshape(1, -1)
-        y_node.value = y_train[i].reshape(1, -1)
+        y_node.value = y_train[k:k+batch_size].reshape(-1, 1)
 
         forward_pass(graph)
         backward_pass(graph)
@@ -151,4 +153,6 @@ plt.scatter(X[:, 0], X[:, 1], c=y)
 plt.xlabel('Feature 1')
 plt.ylabel('Feature 2')
 plt.title('Decision Boundary')
+plt.savefig(f'run using batch {batch_size}')
 plt.show()
+
