@@ -87,8 +87,7 @@ class Linear(Node):
 
     def forward(self):
        A,x,b=self.inputs
-       self.value=x.value@A.value.T+b.value
-    
+       self.value=(x.value@A.value.T)+( b.value)
     def backward(self):
         A,x,b =self.inputs
         self.gradients[A]=self.outputs[0].gradients[self].T@x.value

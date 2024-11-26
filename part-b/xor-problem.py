@@ -1,42 +1,36 @@
-from EDF import *
 import numpy as np
+from EDF import *
 import matplotlib.pyplot as plt
 from scipy.stats import multivariate_normal
 
-# Define constants hyperparamters
-CLASS1_SIZE = 100
-CLASS2_SIZE = 100
-N_FEATURES = 2
-N_OUTPUT = 1
+TOTAL_SAPLES = 200
+
 LEARNING_RATE = 0.02
 EPOCHS = 100
 TEST_SIZE = 0.25
 
-# Define the means and covariances of the two components
-MEAN1 = np.array([1, 2])
-COV1 = np.array([[1, 0], [0, 1]])
-MEAN2 = np.array([1, -2])
-COV2 = np.array([[1, 0], [0, 1]])
+#Define the means
+MEANS = np.array([[3, 3],[3,9],[9,3],[9,9]])
+COV = np.array([[[1, 0.5], [0.5, 0.8]],[[1, 0], [0, 0.5]],[[0.8, 1], [0, 1]],[[0.6, 0], [0.3, 1]]])
+SAMPLES_PER_CLASS=int(TOTAL_SAPLES*0.5)
 
-# Generate random points from the two components
-X1 = multivariate_normal.rvs(MEAN1, COV1, CLASS1_SIZE)
-X2 = multivariate_normal.rvs(MEAN2, COV2, CLASS2_SIZE)
+CA1,CA2 = multivariate_normal.rvs(MEANS[3], COV[1], int(TOTAL_SAPLES*0.25)),multivariate_normal.rvs(MEANS[0], COV[0], int(TOTAL_SAPLES*0.25))
+CB1,CB2 = multivariate_normal.rvs(MEANS[2], COV[2], int(TOTAL_SAPLES*0.25)),multivariate_normal.rvs(MEANS[1], COV[3], int(TOTAL_SAPLES*0.25))
 
 # Combine the points and generate labels
-X = np.vstack((X1, X2))
-y = np.hstack((np.zeros(CLASS1_SIZE), np.ones(CLASS2_SIZE)))
+X = np.vstack((np.vstack((CA1,CA2)), np.vstack((CB1,CB2))))
+y = np.hstack((np.zeros(SAMPLES_PER_CLASS), np.ones(SAMPLES_PER_CLASS)))
 
 # Plot the generated data
-plt.scatter(X[:, 0], X[:, 1], c=y)
+plt.scatter([X[:, 0]], X[:, 1], c=y)
 plt.xlabel('Feature 1')
 plt.ylabel('Feature 2')
 plt.title('Scatter Plot of Generated Data')
 plt.show()
 
-# Split data
 indices = np.arange(X.shape[0])
 np.random.shuffle(indices)
-batch_size=128
+batch_size=1
 test_set_size = int(len(X) * TEST_SIZE)
 test_indices = indices[:test_set_size]
 train_indices = indices[test_set_size:]
@@ -156,6 +150,7 @@ plt.scatter(X[:, 0], X[:, 1], c=y)
 plt.xlabel('Feature 1')
 plt.ylabel('Feature 2')
 plt.title(f'Decision Boundary - batch size {batch_size}')
-plt.savefig(f'run using batch {batch_size}')
+#plt.savefig(f'run using batch {batch_size}')
 plt.show()
+
 
