@@ -65,25 +65,38 @@ hb1_node=Parameter(hb1)
 hb2_node=Parameter(hb2)
 Ob_node=Parameter(Ob)
 # Build computation graph
-h1_node = Linear(hw1_node,x_node,hb1_node)
+h1_node = Linear(x_node,WIDTH,n_features)
 activatedH1 = Sigmoid(h1_node)
 
-h2_node = Linear(hw2_node,activatedH1,hb2_node)
+h2_node = Linear(activatedH1,WIDTH,WIDTH)
 activatedH2 = Sigmoid(h2_node)#output layer
-O_node = Linear(Ow_node,activatedH2,Ob_node)
+O_node = Linear(activatedH2,n_output,WIDTH)
 activatedOutput = Sigmoid(O_node)
 loss = BCE(y_node, activatedOutput)
 
 # Create graph outside the training loop
 
-graph = [x_node,hw1_node,hb1_node,h1_node,activatedH1,hw2_node ,hb2_node, h2_node ,activatedH2,Ow_node,Ob_node,O_node,activatedOutput ,loss]
+#graph = [x_node,hw1_node,hb1_node,h1_node,activatedH1,hw2_node ,hb2_node, h2_node ,activatedH2,Ow_node,Ob_node,O_node,activatedOutput ,loss]
+graph = []
 
-trainable = [hw1_node,hb1_node,hw2_node,hb2_node,Ow_node,Ob_node]
-
+#trainable = [hw1_node,hb1_node,hw2_node,hb2_node,Ow_node,Ob_node]
+trainable = []
 # Training loop
-epochs = 10000
+epochs = 1000
 learning_rate = 0.01
+def topologicalSort(node,graph,trainable):
+ 
 
+    for n in node.inputs:
+        topologicalSort(n,graph,trainable)
+    graph.append(node)
+    if isinstance(node, Parameter):
+            trainable.append(node)
+
+
+
+topologicalSort(loss,graph,trainable)
+    
 # Forward and Backward Pass
 def forward_pass(graph):
     for n in graph:
@@ -126,11 +139,11 @@ for i in range(X_test.shape[0]):
     #x2_node.value = X_test[i][1].reshape(1, -1)
     forward_pass(graph)
     if np.round(activatedOutput.value)== y_test[i]:
-    #    correct_predictions += 1
+        correct_predictions += 1
     #the above method count the the boundary as a correct precdition!
     #that's why i used the below method
     #if activatedOutput.value >0.5 and y_test[i]==1 or activatedOutput.value <0.5 and y_test[i]==0:
-     correct_predictions += 1
+     #correct_predictions += 1
 
 accuracy = correct_predictions / X_test.shape[0]
 print(f"Accuracy: {accuracy * 100:.2f}%")
