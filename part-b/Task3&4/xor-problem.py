@@ -1,6 +1,7 @@
 import numpy as np
 from EDF import *
 import matplotlib.pyplot as plt
+from sklearn import datasets
 from scipy.stats import multivariate_normal
 
 TOTAL_SAPLES = 200
@@ -22,6 +23,8 @@ WIDTH=20
 # Combine the points and generate labels
 X = np.vstack((np.vstack((CA1,CA2)), np.vstack((CB1,CB2))))
 y = np.hstack((np.zeros(SAMPLES_PER_CLASS), np.ones(SAMPLES_PER_CLASS)))
+mnist = datasets.load_digits()
+X, y = mnist['data'], mnist['target'].astype(int)
 
 # Plot the generated data
 plt.scatter([X[:, 0]], X[:, 1], c=y)
@@ -44,26 +47,9 @@ y_train, y_test = y[train_indices], y[test_indices]
 # Model parameters
 n_features = X_train.shape[1]
 n_output = 1
-
-
-hw1=np.random.randn(WIDTH,n_features)#hidden layer 1 cof
-hw2=np.random.randn(WIDTH,WIDTH)#hidden layer 2 cof
-Ow=np.random.randn(n_output,WIDTH)#Output layer cof
-hb1=np.random.randn(WIDTH)#hidden layer 1 bias
-hb2=np.random.randn(WIDTH)#hidden layer 2 bias
-Ob=np.random.randn(n_output)#Output layer bias
-
 x_node = Input()
-
 y_node = Input()
 
-
-hw1_node=Parameter(hw1)
-hw2_node=Parameter(hw2)
-Ow_node=Parameter(Ow)
-hb1_node=Parameter(hb1)
-hb2_node=Parameter(hb2)
-Ob_node=Parameter(Ob)
 # Build computation graph
 h1_node = Linear(x_node,WIDTH,n_features)
 activatedH1 = Sigmoid(h1_node)
@@ -75,15 +61,9 @@ activatedOutput = Sigmoid(O_node)
 loss = BCE(y_node, activatedOutput)
 
 # Create graph outside the training loop
-
-#graph = [x_node,hw1_node,hb1_node,h1_node,activatedH1,hw2_node ,hb2_node, h2_node ,activatedH2,Ow_node,Ob_node,O_node,activatedOutput ,loss]
 graph = []
-
-#trainable = [hw1_node,hb1_node,hw2_node,hb2_node,Ow_node,Ob_node]
 trainable = []
-# Training loop
-epochs = 1000
-learning_rate = 0.01
+
 def topologicalSort(node,graph,trainable):
  
 
@@ -111,7 +91,9 @@ def sgd_update(trainables, learning_rate=1e-2):
     for t in trainables:
         t.value -= learning_rate * t.gradients[t][0]
 
-
+# Training loop
+epochs = 1000
+learning_rate = 0.01
 for epoch in range(epochs):
     loss_value = 0
     for i in range(int(X_train.shape[0]/BATCH_SIZE)):
