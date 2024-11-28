@@ -6,17 +6,19 @@ from scipy.stats import multivariate_normal
 TOTAL_SAPLES = 200
 
 LEARNING_RATE = 0.02
-EPOCHS = 100
+EPOCHS = 1000
 TEST_SIZE = 0.25
 
 #Define the means
-MEANS = np.array([[3, 3],[3,9],[9,3],[9,9]])
-COV = np.array([[[1, 0.5], [0.5, 0.8]],[[1, 0], [0, 0.5]],[[0.8, 1], [0, 1]],[[0.6, 0], [0.3, 1]]])
+MEANS = np.array([[0, 0],[0,10],[10,0],[10,10]])
+COV = np.array([[[1.5, 1], [1, 1.5]],
+                [[1.5, 0.5], [0.5, 1.5]],[[1, 0], [0, 1]],
+                [[1, 0], [0, 1]]])
 SAMPLES_PER_CLASS=int(TOTAL_SAPLES*0.5)
 
-CA1,CA2 = multivariate_normal.rvs(MEANS[3], COV[1], int(TOTAL_SAPLES*0.25)),multivariate_normal.rvs(MEANS[0], COV[0], int(TOTAL_SAPLES*0.25))
-CB1,CB2 = multivariate_normal.rvs(MEANS[2], COV[2], int(TOTAL_SAPLES*0.25)),multivariate_normal.rvs(MEANS[1], COV[3], int(TOTAL_SAPLES*0.25))
-
+CA1,CA2 = multivariate_normal.rvs(MEANS[3], COV[3], int(TOTAL_SAPLES*0.25)),multivariate_normal.rvs(MEANS[0], COV[3], int(TOTAL_SAPLES*0.25))
+CB1,CB2 = multivariate_normal.rvs(MEANS[2], COV[3], int(TOTAL_SAPLES*0.25)),multivariate_normal.rvs(MEANS[1], COV[3], int(TOTAL_SAPLES*0.25))
+WIDTH=20
 # Combine the points and generate labels
 X = np.vstack((np.vstack((CA1,CA2)), np.vstack((CB1,CB2))))
 y = np.hstack((np.zeros(SAMPLES_PER_CLASS), np.ones(SAMPLES_PER_CLASS)))
@@ -30,7 +32,8 @@ plt.show()
 
 indices = np.arange(X.shape[0])
 np.random.shuffle(indices)
-batch_size=1
+BATCH_SIZE=2
+
 test_set_size = int(len(X) * TEST_SIZE)
 test_indices = indices[:test_set_size]
 train_indices = indices[test_set_size:]
@@ -42,43 +45,44 @@ y_train, y_test = y[train_indices], y[test_indices]
 n_features = X_train.shape[1]
 n_output = 1
 
-# Initialize weights and biases
-W0 = np.zeros(1)
-A=np.random.randn(n_output,n_features)*0.1
-b=np.random.randn(1)*0.1
-W1 = np.random.randn(1) * 0.1
-W2 = np.random.randn(1) * 0.1
 
-# Create nodes
-#x1_node = Input()
+hw1=np.random.randn(WIDTH,n_features)#hidden layer 1 cof
+hw2=np.random.randn(WIDTH,WIDTH)#hidden layer 2 cof
+Ow=np.random.randn(n_output,WIDTH)#Output layer cof
+hb1=np.random.randn(WIDTH)#hidden layer 1 bias
+hb2=np.random.randn(WIDTH)#hidden layer 2 bias
+Ob=np.random.randn(n_output)#Output layer bias
+
 x_node = Input()
-#x2_node = Input()
+
 y_node = Input()
 
-w0_node = Parameter(W0)
-w1_node = Parameter(W1)
-w2_node = Parameter(W2)
-#b1_node = Parameter(b1)
-A_node=Parameter(A)
-b_node=Parameter(b)
+
+hw1_node=Parameter(hw1)
+hw2_node=Parameter(hw2)
+Ow_node=Parameter(Ow)
+hb1_node=Parameter(hb1)
+hb2_node=Parameter(hb2)
+Ob_node=Parameter(Ob)
 # Build computation graph
-z_node = Linear(A_node,x_node,b_node)
-#u1_node = Multiply(x1_node,w1_node)
-#u2_node = Multiply(x2_node,w2_node)
-#u12_node = Addition(u1_node,u2_node)
-#u_node = Addition(u12_node, w0_node)
-sigmoid = Sigmoid(z_node)
-loss = BCE(y_node, sigmoid)
+h1_node = Linear(hw1_node,x_node,hb1_node)
+activatedH1 = Sigmoid(h1_node)
+
+h2_node = Linear(hw2_node,activatedH1,hb2_node)
+activatedH2 = Sigmoid(h2_node)#output layer
+O_node = Linear(Ow_node,activatedH2,Ob_node)
+activatedOutput = Sigmoid(O_node)
+loss = BCE(y_node, activatedOutput)
 
 # Create graph outside the training loop
-#graph = [x1_node,x2_node,w0_node,w1_node,w2_node,u1_node,u2_node,u12_node,u_node,sigmoid,loss]
-graph = [x_node,A_node,b_node,z_node,y_node,sigmoid,loss]
-#trainable = [w0_node,w1_node,w2_node]
-trainable = [A_node,b_node]
+
+graph = [x_node,hw1_node,hb1_node,h1_node,activatedH1,hw2_node ,hb2_node, h2_node ,activatedH2,Ow_node,Ob_node,O_node,activatedOutput ,loss]
+
+trainable = [hw1_node,hb1_node,hw2_node,hb2_node,Ow_node,Ob_node]
 
 # Training loop
-epochs = 100
-learning_rate = 0.001
+epochs = 10000
+learning_rate = 0.01
 
 # Forward and Backward Pass
 def forward_pass(graph):
@@ -97,13 +101,13 @@ def sgd_update(trainables, learning_rate=1e-2):
 
 for epoch in range(epochs):
     loss_value = 0
-    for i in range(int(X_train.shape[0]/batch_size)):
-        k=i*batch_size
+    for i in range(int(X_train.shape[0]/BATCH_SIZE)):
+        k=i*BATCH_SIZE
 
-        x_node.value=X_train[k:k+batch_size]
+        x_node.value=X_train[k:k+BATCH_SIZE]
         #x1_node.value = X_train[i][0].reshape(1, -1)
        # x2_node.value = X_train[i][1].reshape(1, -1)
-        y_node.value = y_train[k:k+batch_size].reshape(-1, 1)
+        y_node.value = y_train[k:k+BATCH_SIZE].reshape(-1, 1)
 
         forward_pass(graph)
         backward_pass(graph)
@@ -121,12 +125,12 @@ for i in range(X_test.shape[0]):
     x_node.value=X_test[i]
     #x2_node.value = X_test[i][1].reshape(1, -1)
     forward_pass(graph)
-   # if np.round(sigmoid.value)== y_test[i]:
+    if np.round(activatedOutput.value)== y_test[i]:
     #    correct_predictions += 1
     #the above method count the the boundary as a correct precdition!
     #that's why i used the below method
-    if sigmoid.value >0.5 and y_test[i]==1 or sigmoid.value <0.5 and y_test[i]==0:
-        correct_predictions += 1
+    #if activatedOutput.value >0.5 and y_test[i]==1 or activatedOutput.value <0.5 and y_test[i]==0:
+     correct_predictions += 1
 
 accuracy = correct_predictions / X_test.shape[0]
 print(f"Accuracy: {accuracy * 100:.2f}%")
@@ -135,22 +139,17 @@ x_min, x_max = X[:, 0].min(), X[:, 0].max()
 y_min, y_max = X[:, 1].min(), X[:, 1].max()
 xx, yy = np.meshgrid(np.linspace(x_min, x_max), np.linspace(y_min, y_max))
 Z = []
-for i,j in zip(xx.ravel(),yy.ravel()):
-    #x1_node.value = np.array([i]).reshape(1, -1)
-   
-
-   # x2_node.value = np.array([j]).reshape(1, -1)
-    x_node.value = np.array([i,j]) 
+for i, j in zip(xx.ravel(), yy.ravel()):
+    x_node.value = np.array([i, j]).reshape(1, -1)
     forward_pass(graph)
-    Z.append(sigmoid.value)
+    Z.append(activatedOutput.value)
+
 Z = np.array(Z).reshape(xx.shape)
 
-plt.contourf(xx, yy, Z, alpha=0.8)
-plt.scatter(X[:, 0], X[:, 1], c=y)
+plt.contourf(xx, yy, Z, alpha=0.8, cmap='viridis')
+plt.scatter(X[:, 0], X[:, 1], c=y, cmap='viridis')
 plt.xlabel('Feature 1')
 plt.ylabel('Feature 2')
-plt.title(f'Decision Boundary - batch size {batch_size}')
-#plt.savefig(f'run using batch {batch_size}')
+plt.title(f'Decision Boundary for XOR - batch size {BATCH_SIZE} ,\n EPHOC {epoch}, width {WIDTH}, learning rate {learning_rate}')
+plt.savefig(f'Decision Boundary for XOR  batch size {BATCH_SIZE} EPHOC {epoch} learning rate {learning_rate}.png')
 plt.show()
-
-

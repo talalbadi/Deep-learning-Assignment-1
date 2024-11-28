@@ -86,8 +86,8 @@ class Linear(Node):
         super().__init__([A,x,b])
 
     def forward(self):
-       A,x,b=self.inputs
-       self.value=(x.value@A.value.T)+( b.value)
+       a,x,b=self.inputs
+       self.value=(x.value@a.value.T)+( b.value)
     def backward(self):
         A,x,b =self.inputs
         self.gradients[A]=self.outputs[0].gradients[self].T@x.value
