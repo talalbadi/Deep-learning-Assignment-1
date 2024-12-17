@@ -32,7 +32,7 @@ plt.show()
 
 indices = np.arange(X.shape[0])
 np.random.shuffle(indices)
-BATCH_SIZE=2
+BATCH_SIZE=16
 
 test_set_size = int(len(X) * TEST_SIZE)
 test_indices = indices[:test_set_size]
@@ -126,11 +126,11 @@ for i in range(X_test.shape[0]):
     #x2_node.value = X_test[i][1].reshape(1, -1)
     forward_pass(graph)
     if np.round(activatedOutput.value)== y_test[i]:
-    #    correct_predictions += 1
+       correct_predictions += 1
     #the above method count the the boundary as a correct precdition!
     #that's why i used the below method
     #if activatedOutput.value >0.5 and y_test[i]==1 or activatedOutput.value <0.5 and y_test[i]==0:
-     correct_predictions += 1
+   #  correct_predictions += 1
 
 accuracy = correct_predictions / X_test.shape[0]
 print(f"Accuracy: {accuracy * 100:.2f}%")
@@ -141,7 +141,7 @@ xx, yy = np.meshgrid(np.linspace(x_min, x_max), np.linspace(y_min, y_max))
 Z = []
 for i, j in zip(xx.ravel(), yy.ravel()):
     x_node.value = np.array([i, j]).reshape(1, -1)
-    forward_pass(graph)
+    forward_pass(graph) 
     Z.append(activatedOutput.value)
 
 Z = np.array(Z).reshape(xx.shape)

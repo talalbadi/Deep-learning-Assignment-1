@@ -1,7 +1,6 @@
 import numpy as np
 from EDF import *
 import matplotlib.pyplot as plt
-from sklearn import datasets
 from scipy.stats import multivariate_normal
 
 TOTAL_SAPLES = 200
@@ -23,8 +22,6 @@ WIDTH=20
 # Combine the points and generate labels
 X = np.vstack((np.vstack((CA1,CA2)), np.vstack((CB1,CB2))))
 y = np.hstack((np.zeros(SAMPLES_PER_CLASS), np.ones(SAMPLES_PER_CLASS)))
-mnist = datasets.load_digits()
-X, y = mnist['data'], mnist['target'].astype(int)
 
 # Plot the generated data
 plt.scatter([X[:, 0]], X[:, 1], c=y)
@@ -35,7 +32,7 @@ plt.show()
 
 indices = np.arange(X.shape[0])
 np.random.shuffle(indices)
-BATCH_SIZE=2
+BATCH_SIZE=16
 
 test_set_size = int(len(X) * TEST_SIZE)
 test_indices = indices[:test_set_size]
@@ -44,7 +41,7 @@ train_indices = indices[test_set_size:]
 X_train, X_test = X[train_indices], X[test_indices]
 y_train, y_test = y[train_indices], y[test_indices]
 
-# Model parameters
+# ModModel parameters
 n_features = X_train.shape[1]
 n_output = 1
 x_node = Input()
