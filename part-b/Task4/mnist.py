@@ -22,7 +22,7 @@ X, y = mnist['data'], mnist['target'].astype(int)
 
 indices = np.arange(X.shape[0])
 np.random.shuffle(indices)
-BATCH_SIZE=1
+BATCH_SIZE=16
 y_onehot = np.zeros((y.shape[0],10))
 y_onehot[np.arange(y.shape[0]), y] = 1
 test_set_size = int(len(X) * TEST_SIZE)
@@ -78,7 +78,7 @@ def sgd_update(trainables, LEARNING_RATE):
         t.value -= LEARNING_RATE * t.gradients[t]
 
 # Training loop
-epochs = 10
+epochs = 128
 learning_rate = 0.01
 for epoch in range(epochs):
     loss_value = 0
@@ -113,18 +113,16 @@ for i in range(X_test.shape[0]):
     confusionMatrix[y_true_labels[i],pred_class]+=1
     
 
-# Visualize the confusion matrix
+
 plt.figure(figsize=(8,6))
 plt.imshow(confusionMatrix, interpolation='nearest', cmap=plt.cm.Blues)
 plt.title('Confusion Matrix')
-plt.colorbar()
+
 tick_marks = np.arange(n_output)
 plt.xticks(tick_marks, tick_marks)
 plt.yticks(tick_marks, tick_marks)
 plt.xlabel('Predicted Label')
 plt.ylabel('True Label')
-
-# Annotate each cell with the numeric value
 thresh = confusionMatrix.max() / 2.
 for i in range(n_output):
     for j in range(n_output):

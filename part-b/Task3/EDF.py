@@ -94,7 +94,8 @@ class Linear(Node):
         A,x,b =self.inputs
         self.gradients[A]=self.outputs[0].gradients[self].T@x.value
         self.gradients[x]=self.outputs[0].gradients[self]@A.value
-        self.gradients[b]=self.outputs[0].gradients[self]
+        self.gradients[b] = np.sum(self.outputs[0].gradients[self], axis=0)
+
          
 
 
