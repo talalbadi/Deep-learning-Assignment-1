@@ -161,7 +161,11 @@ class CrossEntropy(Node):
 
 class Conv(Node):
     def __init__(self,kernal,x):
-        super().__init__([kernal,x])
+        xnode=Node()
+        xnode.value=x
+        kernalnode=Node()
+        kernalnode.value=kernal
+        super().__init__([kernalnode,xnode])
     def forward(self):
         kernal=self.inputs[0].value
         x=self.inputs[1].value
@@ -174,8 +178,14 @@ class Conv(Node):
     def backward(self):
         pass
 class MaxPooling(Node):
-    def __init__(self,  input ,poolsize,stride):
-        Node.__init__(self, [input ,poolsize,stride])
+    def __init__(self,  input ,poolsizetuple,stride):
+        poolsize=Node()
+        poolsize.value=poolsizetuple
+        stridenode=Node()
+        stridenode.value=stride
+        inputnode=Node()
+        inputnode.value=input
+        Node.__init__(self, [inputnode ,poolsize,stridenode])
 
     def forward(self):
        input =self.inputs[0].value
