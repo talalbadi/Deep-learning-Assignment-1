@@ -31,12 +31,22 @@ conv2= FastConv(
     pool1
 )
 relu2 = ReLU(conv2)
-
-
-flatten = Flatten(relu2)                  
+pool2 = MaxPooling(relu2, (2, 2), stride=2)
+conv3= FastConv(
+    np.random.randn(64, 32, 3, 3).astype(np.float32)*np.sqrt(2/(3*3*1)),
+    pool2
+)
+relu3 = ReLU(conv3)
+pool3 = MaxPooling(relu3, (2, 2), stride=2)
+conv4= FastConv(
+    np.random.randn(128, 64, 3, 3).astype(np.float32)*np.sqrt(2/(3*3*1)),
+    pool3
+)
+relu4 = ReLU(conv4)
+flatten = Flatten(relu4)                  
 
 fc = Linear(flatten, out_features=10, in_features=3872)
-softmax = Softmax(fc)
+softmax = Sigmoid(fc)
 loss = CrossEntropy(y_node, softmax)
 
 graph = []
@@ -60,7 +70,7 @@ learningRate = 0.01
 EPOCHS = 1  
 BATCH_SIZE = 512
 
-optimizer = Adam(trainable, lr=learningRate)
+#optimizer = Adam(trainable, lr=learningRate)
 
 for epoch in range(EPOCHS):
     total_loss = 0
@@ -82,7 +92,7 @@ for epoch in range(EPOCHS):
         for node in reversed(graph):
             node.backward()
 
-        optimizer.step()
+       # optimizer.step()
 
         total_loss += loss.value
 

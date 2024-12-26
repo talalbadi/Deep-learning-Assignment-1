@@ -36,6 +36,20 @@ class Parameter(Node):
         self.gradients = {self: 0}
         for n in self.outputs:
             self.gradients[self] += n.gradients[self]
+class Sigmoid(Node):
+    def __init__(self, node):
+        Node.__init__(self, [node])
+
+    def _sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+
+    def forward(self):
+        input_value = self.inputs[0].value
+        self.value = self._sigmoid(input_value)
+
+    def backward(self):
+        partial = self.value * (1 - self.value)
+        self.gradients[self.inputs[0]] = partial * self.outputs[0].gradients[self]
 
 class FastConv(Node):
     def __init__(self, kernel, input_node):

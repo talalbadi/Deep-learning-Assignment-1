@@ -50,9 +50,10 @@ y_node = Input()
 # Build computation graph
 h1_node = Linear(x_node,WIDTH,n_features)
 activatedH1 = Sigmoid(h1_node)
-
-h2_node = Linear(activatedH1,10,WIDTH)
-activatedOutput = Softmax(h2_node)
+h2_node = Linear(activatedH1,WIDTH,WIDTH)
+activatedH2 = Sigmoid(h2_node)
+ho_node = Linear(activatedH2,10,WIDTH)
+activatedOutput = Softmax(ho_node)
 loss = CrossEntropy(y_node, activatedOutput)
 
 # Create graph outside the training loop
