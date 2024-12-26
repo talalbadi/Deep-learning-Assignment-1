@@ -177,13 +177,23 @@ class Conv(Node):
 
     def backward(self):
         pass
+class ReLu(Node):
+    def __init__(self, node):
+        Node.__init__(self, [node])
+    def forward(self):
+        x=self.inputs[0].value
+        self.value=np.maximum(0,x)
+    def backward(self):
+        x=self.inputs[0]
+        self.gradients[x] =  self.outputs[0].gradients[self] if (x>0) else 0
+        
 class MaxPooling(Node):
     def __init__(self,  input ,poolsizetuple,stride):
-        poolsize=Node()
+        poolsize=Input()
         poolsize.value=poolsizetuple
-        stridenode=Node()
+        stridenode=Input()
         stridenode.value=stride
-        inputnode=Node()
+        inputnode=Input()
         inputnode.value=input
         Node.__init__(self, [inputnode ,poolsize,stridenode])
 
